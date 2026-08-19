@@ -14,9 +14,9 @@ class _DeleteState extends State<Delete> {
       appBar: AppBar(title: const Text('Delete')),
       body: const Center(
         child: Text(
-          'Taaaa Haal Haa',
+          'Daniyal',
           style: TextStyle(
-            fontSize: 30,
+            fontSize: 50,
             fontWeight: FontWeight.bold,
             color: Colors.red,
           ),

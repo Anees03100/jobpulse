@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jobpulse/delete.dart';
+import 'package:jobpulse/theme/app_theme.dart';
 
 void main() {
   runApp(const MyApp());
@@ -14,7 +15,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
-      theme: ThemeData(colorScheme: .fromSeed(seedColor: Colors.deepPurple)),
+      theme: AppTheme.light,
       home: const Delete(),
     );
   }
