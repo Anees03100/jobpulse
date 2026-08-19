@@ -18,7 +18,7 @@ class _DeleteState extends State<Delete> {
         children: [
           const Center(
             child: Text(
-              'Daniyal',
+              'Anees',
               style: TextStyle(
                 fontSize: 50,
                 fontWeight: FontWeight.bold,
@@ -27,7 +27,7 @@ class _DeleteState extends State<Delete> {
             ),
           ),
           PrimaryButton(
-            label: 'De',
+            label: 'Delete',
             onPressed: () {
               // Handle delete action
             },
