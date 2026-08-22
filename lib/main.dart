@@ -1,26 +1,28 @@
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:jobpulse/delete.dart';
-import 'package:jobpulse/firebase_options.dart';
-import 'package:jobpulse/theme/app_theme.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
+import 'routing/app_router.dart';
+import 'theme/app_theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  runApp(const MyApp());
+  runApp(const ProviderScope(child: JobPulseApp()));
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class JobPulseApp extends ConsumerWidget {
+  const JobPulseApp({super.key});
 
-  // This widget is the root of your application.
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
+  Widget build(BuildContext context, WidgetRef ref) {
+    final router = ref.watch(appRouterProvider);
+
+    return MaterialApp.router(
+      title: 'JobPulse',
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
       theme: AppTheme.light,
-      home: const Delete(),
+      routerConfig: router,
     );
   }
 }

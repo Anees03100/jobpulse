@@ -12,34 +12,70 @@
 .swiftpm/
 migrate_working_dir/
 
-# IntelliJ related
+# IntelliJ / Android Studio
 *.iml
 *.ipr
 *.iws
 .idea/
 
-# The .vscode folder contains launch configuration and tasks you configure in
-# VS Code which you may wish to be included in version control, so this line
-# is commented out by default.
+# VS Code (uncomment if you don't want local editor settings pushed)
 #.vscode/
 
-# Flutter/Dart/Pub related
+# Flutter / Dart / Pub
 **/doc/api/
 **/ios/Flutter/.last_build_id
 .dart_tool/
+.flutter-plugins
 .flutter-plugins-dependencies
+.packages
 .pub-cache/
 .pub/
 /build/
 /coverage/
 
-# Symbolication related
+# Symbolication & Obfuscation
 app.*.symbols
-
-# Obfuscation related
 app.*.map.json
 
-# Android Studio will place build artifacts here
+# Android Specific
 /android/app/debug
 /android/app/profile
 /android/app/release
+.gradle/
+android/local.properties
+android/.gradle/
+android/captures/
+android/gradleBuild/
+
+# Android Signing Keys & Sensitive Files (NEVER COMMIT)
+*.keystore
+*.jks
+android/key.properties
+
+# iOS / macOS Specific
+**/ios/Pods/
+**/ios/.symlinks/
+**/ios/Flutter/Generated.xcconfig
+**/ios/Flutter/flutter_export_environment.sh
+**/macos/Pods/
+**/macos/.symlinks/
+**/macos/Flutter/Generated.xcconfig
+**/macos/Flutter/flutter_export_environment.sh
+
+# iOS Certificates & Provisioning Profiles (NEVER COMMIT)
+*.p8
+*.p12
+*.mobileprovision
+*.cer
+
+# Environment Variables & Backend Secrets (NEVER COMMIT)
+.env
+.env.*
+*firebase-adminsdk*.json
+service-account*.json
+
+# Optional: Only uncomment if your repository is PUBLIC and you do not want
+# random users copying your client Firebase project identifiers.
+# lib/firebase_options.dart
+# android/app/google-services.json
+# ios/Runner/GoogleService-Info.plist
