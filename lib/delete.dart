@@ -36,7 +36,7 @@ class _DeleteState extends State<Delete> {
           SelectableChip(label: "he", selected: true, onTap: () {}),
           SelectableChip(label: "she", selected: false, onTap: () {}),
           MatchScoreBadge(score: 85, compact: true),
-          MatchScoreCircle(score: 85, label: 'Good Match'),
+          MatchScoreCircle(score: 90, label: 'Good Match'),
           AppCard(child: Text('This is an AppCard')),
           AppTextField(
             label: 'Enter text',
