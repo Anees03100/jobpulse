@@ -16,7 +16,7 @@ class _DeleteState extends State<Delete> {
       appBar: AppBar(title: const Text('Delete')),
       body: Column(
         children: [
-          const Center(
+          Center(
             child: Text(
               'Anees',
               style: TextStyle(
