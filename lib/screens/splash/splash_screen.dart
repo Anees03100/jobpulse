@@ -1,23 +1,47 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../providers/auth_provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:go_router/go_router.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_typography.dart';
 
-class SplashScreen extends ConsumerWidget {
+class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final authState = ref.watch(authStateProvider);
+  State<SplashScreen> createState() => _SplashScreenState();
+}
 
+class _SplashScreenState extends State<SplashScreen> {
+  @override
+  void initState() {
+    super.initState();
+    _navigateNext();
+  }
+
+  Future<void> _navigateNext() async {
+    // Minimum splash display time — guaranteed, not racing anything.
+    await Future.delayed(const Duration(seconds: 2));
+
+    if (!mounted) return;
+
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      context.go('/home');
+    } else {
+      context.go('/sign-in');
+      // Swap to context.go('/onboarding') if you want first-time
+      // users to see onboarding before sign-in.
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Placeholder logo — swap for the real JobPulse mark
             Container(
               height: 72,
               width: 72,
@@ -37,19 +61,6 @@ class SplashScreen extends ConsumerWidget {
             Text(
               'Opportunities that match you.',
               style: AppTypography.bodySecondary,
-            ),
-            const SizedBox(height: 32),
-            authState.when(
-              // Still resolving auth state — show a small loader
-              loading: () => const SizedBox(
-                height: 20,
-                width: 20,
-                child: CircularProgressIndicator(strokeWidth: 2),
-              ),
-              error: (_, _) => const SizedBox.shrink(),
-              // Once resolved, the router (see main.dart) redirects
-              // automatically — nothing to render here.
-              data: (_) => const SizedBox.shrink(),
             ),
           ],
         ),
