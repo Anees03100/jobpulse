@@ -1,14 +1,16 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../services/firebase/auth_service.dart';
+import '../services/firebase/firestore_service.dart';
 
-/// Exposes the AuthService instance to the rest of the app.
-final authServiceProvider = Provider<AuthService>((ref) {
-  return AuthService(FirebaseAuth.instance);
-});
+final authServiceProvider = Provider<AuthService>(
+  (ref) => AuthService(FirebaseAuth.instance),
+);
+final firestoreServiceProvider = Provider<FirestoreService>(
+  (ref) => FirestoreService(),
+);
 
-/// Streams the current Firebase auth state (null = signed out).
-/// Screens/router watch this to decide where to send the user.
 final authStateProvider = StreamProvider<User?>((ref) {
   return ref.watch(authServiceProvider).authStateChanges;
 });

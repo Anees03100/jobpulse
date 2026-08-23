@@ -1,14 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
-/// Thin wrapper around FirebaseAuth — keeps Firebase-specific code
-/// out of the UI and providers layer.
 class AuthService {
   AuthService(this._firebaseAuth);
 
   final FirebaseAuth _firebaseAuth;
 
   Stream<User?> get authStateChanges => _firebaseAuth.authStateChanges();
-
   User? get currentUser => _firebaseAuth.currentUser;
 
   Future<UserCredential> signUp({
@@ -35,7 +33,29 @@ class AuthService {
     return _firebaseAuth.sendPasswordResetEmail(email: email);
   }
 
-  Future<void> signOut() {
-    return _firebaseAuth.signOut();
+  /// Returns null if the user cancels the account picker (not an error).
+  /// GoogleSignIn.instance must already be initialize()'d in main().
+  Future<UserCredential?> signInWithGoogle() async {
+    final googleSignIn = GoogleSignIn.instance;
+
+    final GoogleSignInAccount googleUser;
+    try {
+      googleUser = await googleSignIn.authenticate();
+    } catch (e) {
+      // authenticate() throws (rather than returning null) when the
+      // user cancels the Credential Manager sheet on Android.
+      return null;
+    }
+
+    // idToken is available synchronously off the authenticated account.
+    final idToken = googleUser.authentication.idToken;
+
+    final credential = GoogleAuthProvider.credential(idToken: idToken);
+    return _firebaseAuth.signInWithCredential(credential);
+  }
+
+  Future<void> signOut() async {
+    await GoogleSignIn.instance.signOut();
+    await _firebaseAuth.signOut();
   }
 }

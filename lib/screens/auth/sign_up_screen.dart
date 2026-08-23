@@ -76,17 +76,21 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
     }
   }
 
-  String _mapFirebaseError(String raw) {
-    if (raw.contains('email-already-in-use')) {
-      return 'An account already exists with this email.';
+  Future<void> _handleGoogleSignIn() async {
+    setState(() => _isLoading = true);
+    try {
+      final credential = await ref.read(authServiceProvider).signInWithGoogle();
+      if (credential != null) {
+        await ref
+            .read(firestoreServiceProvider)
+            .ensureUserDocExists(credential.user!);
+      }
+      // credential == null means the user cancelled the picker — do nothing
+    } catch (e) {
+      if (mounted) AppSnackbar.error(context, ErrorMapper.map(e));
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
     }
-    if (raw.contains('weak-password')) {
-      return 'Password should be at least 6 characters.';
-    }
-    if (raw.contains('invalid-email')) {
-      return 'Enter a valid email address.';
-    }
-    return 'Something went wrong. Please try again.';
   }
 
   @override
@@ -187,9 +191,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                 const SizedBox(height: AppSpacing.lg),
 
                 OutlinedButton.icon(
-                  onPressed: () {
-                    // Wire up google_sign_in package here later
-                  },
+                  onPressed: _isLoading ? null : _handleGoogleSignIn,
                   icon: const Icon(Icons.g_mobiledata, size: 24),
                   label: const Text('Continue with Google'),
                 ),

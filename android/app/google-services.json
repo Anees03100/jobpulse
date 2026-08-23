@@ -12,7 +12,20 @@
           "package_name": "com.example.jobpulse"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "507378941377-tsqfdrcrjq89hb7d5lfjhiavkmq726rs.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.jobpulse",
+            "certificate_hash": "1d7aceed58d2b6a7b14b9cc0c9d9be8f0e8e2966"
+          }
+        },
+        {
+          "client_id": "507378941377-vldjnd7931l8jheh5hf38cd1003cl8cq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCjvFSjqRmXPoUwGYYSotyZN4XOv2jF67g"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "507378941377-vldjnd7931l8jheh5hf38cd1003cl8cq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

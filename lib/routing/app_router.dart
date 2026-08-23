@@ -7,7 +7,6 @@ import '../screens/splash/splash_screen.dart';
 import '../screens/auth/sign_in_screen.dart';
 import '../screens/auth/sign_up_screen.dart';
 import '../screens/auth/forgot_password_screen.dart';
-import '../screens/home/home_dashboard_screen.dart';
 import 'go_router_refresh_stream.dart';
 
 const _authRoutes = ['/sign-in', '/sign-up', '/forgot-password'];

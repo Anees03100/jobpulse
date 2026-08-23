@@ -50,6 +50,23 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
     }
   }
 
+  Future<void> _handleGoogleSignIn() async {
+    setState(() => _isLoading = true);
+    try {
+      final credential = await ref.read(authServiceProvider).signInWithGoogle();
+      if (credential != null) {
+        await ref
+            .read(firestoreServiceProvider)
+            .ensureUserDocExists(credential.user!);
+      }
+      // credential == null means the user cancelled the picker — do nothing
+    } catch (e) {
+      if (mounted) AppSnackbar.error(context, ErrorMapper.map(e));
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -151,9 +168,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                 const SizedBox(height: AppSpacing.lg),
 
                 OutlinedButton.icon(
-                  onPressed: () {
-                    // Wire up google_sign_in package here later
-                  },
+                  onPressed: _isLoading ? null : _handleGoogleSignIn,
                   icon: const Icon(Icons.g_mobiledata, size: 24),
                   label: const Text('Continue with Google'),
                 ),
