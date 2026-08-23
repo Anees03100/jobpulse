@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:jobpulse/core/utils/app_snackbar.dart';
+import 'package:jobpulse/core/utils/error_mapper.dart';
 import 'package:jobpulse/widgets/butons/primary_button.dart';
 import '../../providers/auth_provider.dart';
 import '../../theme/app_colors.dart';
@@ -32,10 +34,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
   Future<void> _handleSignIn() async {
     if (!_formKey.currentState!.validate()) return;
 
-    setState(() {
-      _isLoading = true;
-      _errorText = null;
-    });
+    setState(() => _isLoading = true);
 
     try {
       await ref
@@ -44,11 +43,8 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
             email: _emailController.text.trim(),
             password: _passwordController.text.trim(),
           );
-      // Router redirect (based on authStateProvider) handles navigation to /home
     } catch (e) {
-      setState(
-        () => _errorText = 'Invalid email or password. Please try again.',
-      );
+      if (mounted) AppSnackbar.error(context, ErrorMapper.map(e));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }

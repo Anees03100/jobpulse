@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:jobpulse/core/utils/app_snackbar.dart';
+import 'package:jobpulse/core/utils/error_mapper.dart';
 import 'package:jobpulse/widgets/butons/primary_button.dart';
 import '../../providers/auth_provider.dart';
 import '../../theme/app_colors.dart';
@@ -68,11 +70,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
 
       // Router redirect (authStateProvider) takes it from here
     } catch (e) {
-      if (mounted) {
-        setState(() {
-          _errorText = _mapFirebaseError(e.toString());
-        });
-      }
+      if (mounted) AppSnackbar.error(context, ErrorMapper.map(e));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
