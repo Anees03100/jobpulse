@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
+import 'package:jobpulse/core/utils/onboarding_prefs.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_typography.dart';
 
@@ -19,19 +20,19 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _navigateNext() async {
-    // Minimum splash display time — guaranteed, not racing anything.
-    await Future.delayed(const Duration(seconds: 3));
-
+    await Future.delayed(const Duration(seconds: 2));
     if (!mounted) return;
 
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       context.go('/home');
-    } else {
-      context.go('/sign-in');
-      // Swap to context.go('/onboarding') if you want first-time
-      // users to see onboarding before sign-in.
+      return;
     }
+
+    final hasSeenOnboarding = await OnboardingPrefs.hasSeenOnboarding();
+    if (!mounted) return;
+
+    context.go(hasSeenOnboarding ? '/sign-in' : '/onboarding');
   }
 
   @override

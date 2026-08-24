@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:jobpulse/core/utils/onboarding_prefs.dart';
 import 'package:jobpulse/widgets/butons/primary_button.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_spacing.dart';
@@ -49,9 +50,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   bool get _isLastPage => _currentPage == _steps.length - 1;
 
-  void _goToNext() {
+  Future<void> _goToNext() async {
     if (_isLastPage) {
-      context.go('/sign-in');
+      await OnboardingPrefs.markOnboardingSeen();
+      if (mounted) context.go('/sign-in');
       return;
     }
     _pageController.nextPage(
@@ -60,7 +62,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-  void _skip() => context.go('/sign-in');
+  Future<void> _skip() async {
+    await OnboardingPrefs.markOnboardingSeen();
+    if (mounted) context.go('/sign-in');
+  }
 
   @override
   void dispose() {

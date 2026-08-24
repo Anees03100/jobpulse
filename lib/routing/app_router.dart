@@ -1,6 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:jobpulse/providers/user_preferences_provider.dart';
 import 'package:jobpulse/screens/home/home_shell.dart';
+import 'package:jobpulse/screens/preferences_setup/location_preferences_screen.dart';
+import 'package:jobpulse/screens/preferences_setup/opportunity_type_screen.dart';
+import 'package:jobpulse/screens/preferences_setup/skills_selection_screen.dart';
 import '../providers/auth_provider.dart';
 import '../screens/onboarding/onboarding_screen.dart';
 import '../screens/splash/splash_screen.dart';
@@ -12,10 +16,12 @@ import 'go_router_refresh_stream.dart';
 const _authRoutes = ['/sign-in', '/sign-up', '/forgot-password'];
 
 final appRouterProvider = Provider<GoRouter>((ref) {
-  // read, not watch — the router is built ONCE per app lifetime.
-  // Auth changes are handled via refreshListenable below, not by
-  // recreating this provider.
   final authService = ref.read(authServiceProvider);
+  const prefRoutes = [
+    '/preferences/opportunity-type',
+    '/preferences/skills',
+    '/preferences/location',
+  ];
 
   return GoRouter(
     initialLocation: '/splash',
@@ -30,22 +36,35 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (_, _) => const ForgotPasswordScreen(),
       ),
       GoRoute(path: '/home', builder: (_, _) => const HomeShell()),
+      GoRoute(
+        path: '/preferences/opportunity-type',
+        builder: (_, _) => const OpportunityTypeScreen(),
+      ),
+      GoRoute(
+        path: '/preferences/skills',
+        builder: (_, _) => const SkillsSelectionScreen(),
+      ),
+      GoRoute(
+        path: '/preferences/location',
+        builder: (_, _) => const LocationPreferencesScreen(),
+      ),
     ],
-    redirect: (context, state) {
+    redirect: (context, state) async {
       final isLoggedIn = authService.currentUser != null;
       final loc = state.matchedLocation;
 
-      if (loc == '/splash') return null; // splash handles its own navigation
-      if (loc == '/onboarding') return null;
-
-      // Signed in but still sitting on an auth screen → go home.
-      // (This also fixes sign-in never actually navigating before —
-      // it was relying on the accidental full-router-reset too.)
-      if (isLoggedIn && _authRoutes.contains(loc)) return '/home';
-
-      // Not signed in but trying to reach a protected route → sign in.
+      if (loc == '/splash' || loc == '/onboarding') return null;
       if (!isLoggedIn && !_authRoutes.contains(loc)) return '/sign-in';
-
+      if (isLoggedIn && _authRoutes.contains(loc)) {
+        final hasPrefs = await ref.read(preferencesSetProvider.future);
+        return hasPrefs ? '/home' : '/preferences/opportunity-type';
+      }
+      if (isLoggedIn && loc == '/home') {
+        final hasPrefs = await ref.read(preferencesSetProvider.future);
+        if (!hasPrefs) return '/preferences/opportunity-type';
+      }
+      if (isLoggedIn && prefRoutes.contains(loc))
+        return null; // let them proceed through setup
       return null;
     },
   );
