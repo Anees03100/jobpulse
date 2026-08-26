@@ -31,7 +31,7 @@ class HomeDashboardScreen extends ConsumerWidget {
             AppSpacing.lg,
             AppSpacing.md,
             AppSpacing.lg,
-            100, // bottom pad for floating nav
+            100,
           ),
           children: [
             // ── Header ──────────────────────────────────
@@ -114,13 +114,13 @@ class HomeDashboardScreen extends ConsumerWidget {
             ),
             const SizedBox(height: AppSpacing.sm),
             const OpportunityCard(
-              title: 'Flutter Developer Intern',
+              title: 'Flutter Developer Interne',
               company: 'TechNova Solutions',
               location: 'Islamabad, Pakistan',
               type: 'Internship',
               matchScore: 94,
               postedTime: '18 min ago',
-              skills: ['Flutter', 'Dart', 'Firebase'],
+              skills: ['Flutter', 'Dart', 'Firebase', 'Git'],
             ),
 
             const SizedBox(height: AppSpacing.lg),
