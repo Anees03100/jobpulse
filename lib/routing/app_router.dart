@@ -63,17 +63,21 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 
       if (!isLoggedIn && !_authRoutes.contains(loc)) return '/sign-in';
 
+      final hasPrefs = isLoggedIn
+          ? await ref.read(preferencesSetProvider.future)
+          : false;
+
       if (isLoggedIn && _authRoutes.contains(loc)) {
-        final hasPrefs = await ref.read(preferencesSetProvider.future);
         return hasPrefs ? '/home' : '/preferences/opportunity-type';
       }
 
-      if (isLoggedIn && loc == '/home') {
-        final hasPrefs = await ref.read(preferencesSetProvider.future);
-        if (!hasPrefs) return '/preferences/opportunity-type';
+      if (isLoggedIn && _prefRoutes.contains(loc)) {
+        return hasPrefs ? '/home' : null;
       }
 
-      if (isLoggedIn && _prefRoutes.contains(loc)) return null;
+      if (isLoggedIn && loc == '/home' && !hasPrefs) {
+        return '/preferences/opportunity-type';
+      }
 
       return null;
     },

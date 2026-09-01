@@ -50,7 +50,7 @@ final preferencesDraftProvider =
 /// Used by the router to decide whether to send them to /preferences
 /// or straight to /home. Refreshed on every auth state change.
 final preferencesSetProvider = FutureProvider<bool>((ref) async {
-  final user = ref.watch(authStateProvider).value;
+  final user = ref.read(authServiceProvider).currentUser;
   if (user == null) return false;
 
   final doc = await FirebaseFirestore.instance
