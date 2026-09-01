@@ -32,10 +32,12 @@ class PreferencesDraftNotifier extends Notifier<UserPreferences> {
   }
 
   Future<void> saveToFirestore(String uid) async {
-    await FirebaseFirestore.instance.collection('users').doc(uid).update({
-      ...state.toMap(),
-      'preferencesSet': true,
-    });
+    await FirebaseFirestore.instance.collection('users').doc(uid).set(
+      {...state.toMap(), 'preferencesSet': true},
+      SetOptions(
+        merge: true,
+      ), // creates the doc if missing, updates if it exists
+    );
   }
 }
 

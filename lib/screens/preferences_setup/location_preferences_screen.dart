@@ -56,16 +56,15 @@ class _LocationPreferencesScreenState
     try {
       final uid = ref.read(authServiceProvider).currentUser!.uid;
       await ref.read(preferencesDraftProvider.notifier).saveToFirestore(uid);
-      // Invalidate so the router picks up preferencesSet = true immediately
       ref.invalidate(preferencesSetProvider);
+
+      debugPrint('✅ Preferences saved — navigating to /preferences/saved');
+
       if (mounted) {
-        AppSnackbar.success(
-          context,
-          'Preferences saved! Refreshing your matches.',
-        );
-        context.go('/home');
+        context.go('/preferences/saved');
       }
     } catch (e) {
+      debugPrint('❌ Preferences save failed: $e');
       if (mounted) AppSnackbar.error(context, ErrorMapper.map(e));
     } finally {
       if (mounted) setState(() => _isSaving = false);

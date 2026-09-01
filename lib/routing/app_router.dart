@@ -1,27 +1,29 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:jobpulse/providers/user_preferences_provider.dart';
-import 'package:jobpulse/screens/home/home_shell.dart';
-import 'package:jobpulse/screens/preferences_setup/location_preferences_screen.dart';
-import 'package:jobpulse/screens/preferences_setup/opportunity_type_screen.dart';
-import 'package:jobpulse/screens/preferences_setup/skills_selection_screen.dart';
 import '../providers/auth_provider.dart';
+import '../providers/user_preferences_provider.dart';
 import '../screens/onboarding/onboarding_screen.dart';
 import '../screens/splash/splash_screen.dart';
 import '../screens/auth/sign_in_screen.dart';
 import '../screens/auth/sign_up_screen.dart';
 import '../screens/auth/forgot_password_screen.dart';
+import '../screens/home/home_shell.dart';
+import '../screens/preferences_setup/opportunity_type_screen.dart';
+import '../screens/preferences_setup/skills_selection_screen.dart';
+import '../screens/preferences_setup/location_preferences_screen.dart';
+import '../screens/preferences_setup/preferences_saved_screen.dart';
 import 'go_router_refresh_stream.dart';
 
 const _authRoutes = ['/sign-in', '/sign-up', '/forgot-password'];
+const _prefRoutes = [
+  '/preferences/opportunity-type',
+  '/preferences/skills',
+  '/preferences/location',
+  '/preferences/saved',
+];
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   final authService = ref.read(authServiceProvider);
-  const prefRoutes = [
-    '/preferences/opportunity-type',
-    '/preferences/skills',
-    '/preferences/location',
-  ];
 
   return GoRouter(
     initialLocation: '/splash',
@@ -48,23 +50,31 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/preferences/location',
         builder: (_, _) => const LocationPreferencesScreen(),
       ),
+      GoRoute(
+        path: '/preferences/saved',
+        builder: (_, _) => const PreferencesSavedScreen(),
+      ),
     ],
     redirect: (context, state) async {
       final isLoggedIn = authService.currentUser != null;
       final loc = state.matchedLocation;
 
       if (loc == '/splash' || loc == '/onboarding') return null;
+
       if (!isLoggedIn && !_authRoutes.contains(loc)) return '/sign-in';
+
       if (isLoggedIn && _authRoutes.contains(loc)) {
         final hasPrefs = await ref.read(preferencesSetProvider.future);
         return hasPrefs ? '/home' : '/preferences/opportunity-type';
       }
+
       if (isLoggedIn && loc == '/home') {
         final hasPrefs = await ref.read(preferencesSetProvider.future);
         if (!hasPrefs) return '/preferences/opportunity-type';
       }
-      if (isLoggedIn && prefRoutes.contains(loc))
-        return null; // let them proceed through setup
+
+      if (isLoggedIn && _prefRoutes.contains(loc)) return null;
+
       return null;
     },
   );
