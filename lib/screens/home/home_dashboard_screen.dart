@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:jobpulse/providers/user_preferences_provider.dart';
 import '../../core/utils/app_snackbar.dart';
 import '../../core/utils/error_mapper.dart';
 import '../../providers/auth_provider.dart';
@@ -14,6 +15,7 @@ class HomeDashboardScreen extends ConsumerWidget {
   Future<void> _handleLogout(BuildContext context, WidgetRef ref) async {
     try {
       await ref.read(authServiceProvider).signOut();
+      ref.invalidate(preferencesSetProvider);
     } catch (e) {
       if (context.mounted) AppSnackbar.error(context, ErrorMapper.map(e));
     }

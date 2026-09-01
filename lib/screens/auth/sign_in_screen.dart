@@ -5,6 +5,7 @@ import 'package:jobpulse/core/utils/app_snackbar.dart';
 import 'package:jobpulse/core/utils/error_mapper.dart';
 import 'package:jobpulse/widgets/butons/primary_button.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/user_preferences_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_spacing.dart';
 import '../../theme/app_typography.dart';
@@ -43,6 +44,11 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
             email: _emailController.text.trim(),
             password: _passwordController.text.trim(),
           );
+
+      final hasPrefs = await ref.read(preferencesSetProvider.future);
+      if (!mounted) return;
+
+      context.go(hasPrefs ? '/home' : '/preferences/opportunity-type');
     } catch (e) {
       if (mounted) AppSnackbar.error(context, ErrorMapper.map(e));
     } finally {
@@ -58,8 +64,12 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
         await ref
             .read(firestoreServiceProvider)
             .ensureUserDocExists(credential.user!);
+
+        final hasPrefs = await ref.read(preferencesSetProvider.future);
+        if (!mounted) return;
+
+        context.go(hasPrefs ? '/home' : '/preferences/opportunity-type');
       }
-      // credential == null means the user cancelled the picker — do nothing
     } catch (e) {
       if (mounted) AppSnackbar.error(context, ErrorMapper.map(e));
     } finally {
@@ -108,8 +118,9 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                   keyboardType: TextInputType.emailAddress,
                   prefixIcon: Icons.mail_outline,
                   validator: (value) {
-                    if (value == null || value.isEmpty)
+                    if (value == null || value.isEmpty) {
                       return 'Email is required';
+                    }
                     if (!value.contains('@')) return 'Enter a valid email';
                     return null;
                   },
@@ -121,8 +132,9 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                   obscureText: true,
                   prefixIcon: Icons.lock_outline,
                   validator: (value) {
-                    if (value == null || value.isEmpty)
+                    if (value == null || value.isEmpty) {
                       return 'Password is required';
+                    }
                     return null;
                   },
                 ),

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:jobpulse/core/utils/app_snackbar.dart';
 import 'package:jobpulse/core/utils/error_mapper.dart';
+import 'package:jobpulse/providers/user_preferences_provider.dart';
 import 'package:jobpulse/widgets/butons/primary_button.dart';
 import '../../providers/auth_provider.dart';
 import '../../theme/app_colors.dart';
@@ -67,6 +68,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
             'createdAt': FieldValue.serverTimestamp(),
             'preferencesSet': false,
           });
+      ref.invalidate(preferencesSetProvider);
 
       // Router redirect (authStateProvider) takes it from here
     } catch (e) {
