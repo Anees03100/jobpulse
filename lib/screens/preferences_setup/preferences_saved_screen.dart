@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:jobpulse/screens/home/home_shell.dart';
 import 'package:jobpulse/widgets/butons/primary_button.dart';
 import '../../theme/app_colors.dart';
