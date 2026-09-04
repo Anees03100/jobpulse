@@ -42,6 +42,8 @@ dependencies:
   cloud_firestore: ^6.8.0
   google_sign_in: ^7.2.0
   shared_preferences: ^2.1.1
+  flutter_dotenv: ^6.0.1
+  http: ^1.6.0
 
 dev_dependencies:
   flutter_test:
@@ -64,6 +66,10 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+
+  # The following section is for adding assets to your Flutter application.
+  assets:
+    - .env
 
   # To add assets to your application, add an assets section, like this:
   # assets:
