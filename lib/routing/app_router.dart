@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:jobpulse/models/job_model.dart';
+import 'package:jobpulse/screens/opportunity_details/opportunity_details_screen.dart';
 import '../providers/auth_provider.dart';
 import '../providers/user_preferences_provider.dart';
 import '../screens/onboarding/onboarding_screen.dart';
@@ -53,6 +55,16 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/preferences/saved',
         builder: (_, _) => const PreferencesSavedScreen(),
+      ),
+      GoRoute(
+        path: '/opportunity-details',
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>;
+          return OpportunityDetailsScreen(
+            job: extra['job'] as JobModel,
+            score: extra['score'] as int,
+          );
+        },
       ),
     ],
     redirect: (context, state) async {

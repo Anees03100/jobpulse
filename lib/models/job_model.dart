@@ -97,4 +97,36 @@ class JobModel {
     ];
     return knownSkills.where((skill) => text.contains(skill)).toList();
   }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'title': title,
+      'company': company,
+      'location': location,
+      'type': type,
+      'description': description,
+      'url': url,
+      'postedAt': postedAt.toIso8601String(),
+      'source': source,
+      'skills': skills,
+      'isRemote': isRemote,
+    };
+  }
+
+  factory JobModel.fromMap(Map<String, dynamic> map) {
+    return JobModel(
+      id: map['id'],
+      title: map['title'],
+      company: map['company'],
+      location: map['location'],
+      type: map['type'],
+      description: map['description'],
+      url: map['url'],
+      postedAt: DateTime.tryParse(map['postedAt'] ?? '') ?? DateTime.now(),
+      source: map['source'],
+      skills: List<String>.from(map['skills'] ?? []),
+      isRemote: map['isRemote'] ?? false,
+    );
+  }
 }

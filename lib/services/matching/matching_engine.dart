@@ -72,4 +72,37 @@ class MatchingEngine {
     scored.sort((a, b) => b.score.compareTo(a.score));
     return scored;
   }
+
+  /// Human-readable reasons for the "Why this matches you" section.
+  static List<String> matchReasons(JobModel job, UserPreferences prefs) {
+    final reasons = <String>[];
+
+    final jobSkillsLower = job.skills.map((s) => s.toLowerCase()).toSet();
+    final matchedSkills = prefs.skills
+        .where((s) => jobSkillsLower.contains(s.toLowerCase()))
+        .toList();
+    if (matchedSkills.isNotEmpty) {
+      reasons.add('${matchedSkills.join(', ')} matches your skills');
+    }
+
+    final matchedType = prefs.opportunityTypes
+        .where((t) => job.type.toLowerCase().contains(t.toLowerCase()))
+        .firstOrNull;
+    if (matchedType != null) {
+      reasons.add('$matchedType matches your preference');
+    }
+
+    if (prefs.remote && job.isRemote) {
+      reasons.add('Remote matches your work preference');
+    } else {
+      final matchedCity = prefs.cities
+          .where((c) => job.location.toLowerCase().contains(c.toLowerCase()))
+          .firstOrNull;
+      if (matchedCity != null) {
+        reasons.add('$matchedCity matches your location');
+      }
+    }
+
+    return reasons;
+  }
 }

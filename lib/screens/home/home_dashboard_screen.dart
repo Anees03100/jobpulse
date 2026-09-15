@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:jobpulse/providers/job_feed_provider.dart';
 import 'package:jobpulse/providers/user_preferences_provider.dart';
 import '../../core/utils/app_snackbar.dart';
 import '../../core/utils/error_mapper.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/saved_jobs_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_spacing.dart';
 import '../../theme/app_typography.dart';
@@ -26,6 +28,8 @@ class HomeDashboardScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final name = ref.watch(authStateProvider).value?.displayName ?? 'there';
     final jobFeed = ref.watch(jobFeedProvider);
+    final savedIds = ref.watch(savedJobIdsProvider).value ?? {};
+
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
@@ -183,6 +187,25 @@ class HomeDashboardScreen extends ConsumerWidget {
                       matchScore: best.score,
                       postedTime: _timeAgo(best.job.postedAt),
                       skills: best.job.skills,
+                      isSaved: savedIds.contains(best.job.id),
+                      onTap: () => context.push(
+                        '/opportunity-details',
+                        extra: {'job': best.job, 'score': best.score},
+                      ),
+                      onSaveToggle: () async {
+                        final uid = ref
+                            .read(authServiceProvider)
+                            .currentUser!
+                            .uid;
+                        final service = ref.read(savedJobsServiceProvider);
+                        final isSaved = savedIds.contains(best.job.id);
+                        await toggleSaveJob(
+                          uid: uid,
+                          job: best.job,
+                          isSaved: isSaved,
+                          service: service,
+                        );
+                      },
                     ),
                     const SizedBox(height: AppSpacing.lg),
                     Row(
@@ -210,6 +233,25 @@ class HomeDashboardScreen extends ConsumerWidget {
                           matchScore: scored.score,
                           postedTime: _timeAgo(scored.job.postedAt),
                           skills: scored.job.skills,
+                          isSaved: savedIds.contains(scored.job.id),
+                          onTap: () => context.push(
+                            '/opportunity-details',
+                            extra: {'job': scored.job, 'score': scored.score},
+                          ),
+                          onSaveToggle: () async {
+                            final uid = ref
+                                .read(authServiceProvider)
+                                .currentUser!
+                                .uid;
+                            final service = ref.read(savedJobsServiceProvider);
+                            final isSaved = savedIds.contains(scored.job.id);
+                            await toggleSaveJob(
+                              uid: uid,
+                              job: scored.job,
+                              isSaved: isSaved,
+                              service: service,
+                            );
+                          },
                         ),
                       ),
                     ),
