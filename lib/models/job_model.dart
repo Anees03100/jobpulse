@@ -45,6 +45,28 @@ class JobModel {
     );
   }
 
+  factory JobModel.fromJooble(Map<String, dynamic> json) {
+    final title = (json['title'] as String? ?? '').trim();
+    final snippet = (json['snippet'] as String? ?? '').trim();
+    final combinedText = '$title $snippet'.toLowerCase();
+
+    return JobModel(
+      id: 'jooble_${json['id']}',
+      title: title,
+      company: (json['company'] as String?)?.trim().isNotEmpty == true
+          ? json['company']
+          : 'Unknown Company',
+      location: json['location'] ?? 'Pakistan',
+      type: json['type'] ?? 'Full-time',
+      description: snippet,
+      url: json['link'] ?? '',
+      postedAt: DateTime.tryParse(json['updated'] ?? '') ?? DateTime.now(),
+      source: 'Jooble',
+      skills: _extractSkills(combinedText),
+      isRemote: combinedText.contains('remote'),
+    );
+  }
+
   /// Very simple keyword-matching skill extraction — checks description/title
   /// text against a known skill vocabulary. Good enough for v1; can be
   /// swapped for a smarter NLP approach later.

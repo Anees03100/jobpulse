@@ -1,7 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:jobpulse/services/job_api/jooble_service.dart';
 import '../models/user_preferences_model.dart';
-import '../services/job_api/adzuna_service.dart';
 import '../services/matching/matching_engine.dart';
 import 'auth_provider.dart';
 
@@ -27,21 +28,23 @@ final savedPreferencesProvider = FutureProvider<UserPreferences?>((ref) async {
   );
 });
 
-final adzunaServiceProvider = Provider<AdzunaService>((ref) => AdzunaService());
+final joobleServiceProvider = Provider<JoobleService>((ref) => JoobleService());
 
-/// Fetches jobs matching the user's preferences and returns them
-/// scored + sorted, highest match first.
 final jobFeedProvider = FutureProvider<List<ScoredJob>>((ref) async {
   final prefs = await ref.watch(savedPreferencesProvider.future);
   if (prefs == null || prefs.skills.isEmpty) return [];
 
-  final service = ref.watch(adzunaServiceProvider);
+  final service = ref.watch(joobleServiceProvider);
 
-  // Adzuna's "what" param works best as a simple keyword string —
-  // joining top skills gives a reasonably relevant query.
-  final query = prefs.skills.take(3).join(' ');
-  final location = prefs.cities.isNotEmpty ? prefs.cities.first : null;
+  final keywords = prefs.skills.take(3).join(' ');
+  final location = prefs.remote
+      ? null // omit location to widen results when remote is preferred
+      : (prefs.cities.isNotEmpty ? prefs.cities.first : prefs.country);
 
-  final jobs = await service.fetchJobs(query: query, location: location);
+  debugPrint(
+    '🔍 Fetching jobs with keywords="$keywords" and location="$location"',
+  );
+
+  final jobs = await service.fetchJobs(keywords: keywords, location: location);
   return MatchingEngine.scoreAndSort(jobs, prefs);
 });
