@@ -35,16 +35,17 @@ final jobFeedProvider = FutureProvider<List<ScoredJob>>((ref) async {
   if (prefs == null || prefs.skills.isEmpty) return [];
 
   final service = ref.watch(joobleServiceProvider);
-
   final keywords = prefs.skills.take(3).join(' ');
-  final location = prefs.remote
-      ? null // omit location to widen results when remote is preferred
+  final city = prefs.remote
+      ? null
       : (prefs.cities.isNotEmpty ? prefs.cities.first : prefs.country);
 
-  debugPrint(
-    '🔍 Fetching jobs with keywords="$keywords" and location="$location"',
-  );
+  var jobs = await service.fetchJobs(keywords: keywords, location: city);
 
-  final jobs = await service.fetchJobs(keywords: keywords, location: location);
+  // Widen search if the city-specific query comes back empty
+  if (jobs.isEmpty && city != null) {
+    jobs = await service.fetchJobs(keywords: keywords, location: null);
+  }
+
   return MatchingEngine.scoreAndSort(jobs, prefs);
 });
