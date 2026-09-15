@@ -26,4 +26,18 @@ class SavedJobsService {
       uid,
     ).snapshots().map((snap) => snap.docs.map((d) => d.id).toSet());
   }
+
+  /// Streams full saved job entries (not just IDs) — used by the Saved screen.
+  Stream<List<Map<String, dynamic>>> savedJobsStream(String uid) {
+    return _collection(uid)
+        .orderBy('savedAt', descending: true)
+        .snapshots()
+        .map(
+          (snap) => snap.docs.map((d) => {...d.data(), 'id': d.id}).toList(),
+        );
+  }
+
+  Future<void> updateStatus(String uid, String jobId, String status) {
+    return _collection(uid).doc(jobId).update({'status': status});
+  }
 }

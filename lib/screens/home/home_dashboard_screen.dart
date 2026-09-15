@@ -83,16 +83,6 @@ class HomeDashboardScreen extends ConsumerWidget {
             ),
 
             const SizedBox(height: AppSpacing.lg),
-
-            // ── TEMP: logout button — remove once Profile screen has its own ──
-            OutlinedButton.icon(
-              onPressed: () => _handleLogout(context, ref),
-              icon: const Icon(Icons.logout, size: 18),
-              label: const Text('Log out (temp)'),
-            ),
-
-            const SizedBox(height: AppSpacing.lg),
-
             // ── Match summary ──────────────────────────────────
             Row(
               children: [
