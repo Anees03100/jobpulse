@@ -29,6 +29,12 @@ class HomeDashboardScreen extends ConsumerWidget {
     final name = ref.watch(authStateProvider).value?.displayName ?? 'there';
     final jobFeed = ref.watch(jobFeedProvider);
     final savedIds = ref.watch(savedJobIdsProvider).value ?? {};
+    ref.listen(authStateProvider, (previous, next) {
+      final user = next.value;
+      if (user != null) {
+        ref.read(fcmServiceProvider).initAndSaveToken(user.uid);
+      }
+    });
 
     return Scaffold(
       backgroundColor: AppColors.background,

@@ -1,3 +1,4 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -10,6 +11,11 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  FirebaseMessaging.onMessage.listen((message) {
+    debugPrint('📬 Foreground notification: ${message.notification?.title}');
+    // For now this just logs — a full in-app banner/snackbar can be added
+    // once we're sending real notifications to test against.
+  });
 
   await GoogleSignIn.instance.initialize(
     serverClientId:

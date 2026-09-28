@@ -50,6 +50,7 @@ class ProfileScreen extends ConsumerWidget {
       backgroundColor: AppColors.background,
       appBar: AppBar(
         title: Text('Profile', style: AppTypography.sectionHeading),
+        automaticallyImplyLeading: false,
       ),
       body: SafeArea(
         child: ListView(

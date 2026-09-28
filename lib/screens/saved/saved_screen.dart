@@ -62,6 +62,7 @@ class _SavedScreenState extends ConsumerState<SavedScreen>
       backgroundColor: AppColors.background,
       appBar: AppBar(
         title: Text('Saved', style: AppTypography.sectionHeading),
+        automaticallyImplyLeading: false,
         bottom: TabBar(
           controller: _tabController,
           labelColor: AppColors.primary,

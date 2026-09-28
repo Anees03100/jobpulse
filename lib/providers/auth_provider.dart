@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:jobpulse/services/firebase/fcm_service.dart';
 import '../services/firebase/auth_service.dart';
 import '../services/firebase/firestore_service.dart';
 
@@ -13,3 +14,5 @@ final firestoreServiceProvider = Provider<FirestoreService>(
 final authStateProvider = StreamProvider<User?>((ref) {
   return ref.watch(authServiceProvider).authStateChanges;
 });
+
+final fcmServiceProvider = Provider<FcmService>((ref) => FcmService());
