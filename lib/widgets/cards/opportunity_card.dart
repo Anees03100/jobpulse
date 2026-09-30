@@ -5,6 +5,14 @@ import '../../theme/app_typography.dart';
 import 'app_card.dart';
 import '../indicators/match_score_badge.dart';
 
+const _avatarColors = [
+  Color(0xFFF57D0A),
+  Color(0xFF2E8B57),
+  Color(0xFF4A6FA5),
+  Color(0xFF9B59B6),
+  Color(0xFFD64545),
+];
+
 class OpportunityCard extends StatelessWidget {
   const OpportunityCard({
     super.key,
@@ -31,59 +39,69 @@ class OpportunityCard extends StatelessWidget {
   final VoidCallback? onTap;
   final VoidCallback? onSaveToggle;
 
+  Color get _avatarColor {
+    final hash = company.hashCode.abs();
+    return _avatarColors[hash % _avatarColors.length];
+  }
+
   @override
   Widget build(BuildContext context) {
     return AppCard(
       onTap: onTap,
+      padding: const EdgeInsets.all(AppSpacing.md),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              // Company logo placeholder
-              Container(
-                height: 40,
-                width: 40,
-                decoration: BoxDecoration(
-                  color: AppColors.lightBackground,
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
-                ),
-                child: const Icon(
-                  Icons.business,
-                  size: 20,
-                  color: AppColors.textSecondary,
+              CircleAvatar(
+                radius: 18,
+                backgroundColor: _avatarColor.withValues(alpha: 0.15),
+                child: Text(
+                  company.isNotEmpty ? company[0].toUpperCase() : '?',
+                  style: AppTypography.body.copyWith(
+                    color: _avatarColor,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
               const SizedBox(width: AppSpacing.sm),
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: AppTypography.cardTitle,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    Text(
-                      company,
-                      style: AppTypography.bodySecondary,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
+                child: Text(
+                  company,
+                  style: AppTypography.bodySecondary,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
-              IconButton(
-                onPressed: onSaveToggle,
-                icon: Icon(
-                  isSaved ? Icons.bookmark : Icons.bookmark_border,
-                  color: isSaved ? AppColors.primary : AppColors.textSecondary,
+              GestureDetector(
+                onTap: onSaveToggle,
+                child: Container(
+                  height: 32,
+                  width: 32,
+                  decoration: BoxDecoration(
+                    color: AppColors.lightBackground,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    isSaved ? Icons.bookmark : Icons.bookmark_border,
+                    size: 16,
+                    color: isSaved
+                        ? AppColors.primary
+                        : AppColors.textSecondary,
+                  ),
                 ),
               ),
             ],
           ),
           const SizedBox(height: AppSpacing.sm),
+          Text(
+            title,
+            style: AppTypography.cardTitle,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: 6),
           Row(
             children: [
               const Icon(
@@ -92,23 +110,38 @@ class OpportunityCard extends StatelessWidget {
                 color: AppColors.textSecondary,
               ),
               const SizedBox(width: 4),
-              Text(location, style: AppTypography.metadata),
-              const SizedBox(width: AppSpacing.sm),
-              Text('· $type', style: AppTypography.metadata),
+              Expanded(
+                child: Text(
+                  location,
+                  style: AppTypography.metadata,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
             ],
           ),
-          if (skills.isNotEmpty) ...[
-            const SizedBox(height: AppSpacing.sm),
-            Text(skills.join(' · '), style: AppTypography.metadata),
-          ],
           const SizedBox(height: AppSpacing.sm),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.lightBackground,
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+                ),
+                child: Text(type, style: AppTypography.metadata),
+              ),
+              const Spacer(),
               MatchScoreBadge(score: matchScore),
-              Text(postedTime, style: AppTypography.metadata),
             ],
           ),
+          if (postedTime.isNotEmpty) ...[
+            const SizedBox(height: 6),
+            Text(postedTime, style: AppTypography.metadata),
+          ],
         ],
       ),
     );
