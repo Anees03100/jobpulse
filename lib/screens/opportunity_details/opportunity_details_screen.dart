@@ -5,7 +5,6 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../core/utils/app_snackbar.dart';
 import '../../core/utils/error_mapper.dart';
 import '../../models/job_model.dart';
-import '../../models/user_preferences_model.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/job_feed_provider.dart';
 import '../../providers/saved_jobs_provider.dart';
@@ -64,8 +63,9 @@ class OpportunityDetailsScreen extends ConsumerWidget {
     }
     final uri = Uri.parse(job.url);
     if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
-      if (context.mounted)
+      if (context.mounted) {
         AppSnackbar.error(context, 'Could not open the listing.');
+      }
     }
   }
 

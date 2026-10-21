@@ -1,5 +1,4 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 /// Central place to convert exceptions into user-facing messages.
 /// Add new cases here as new features (job APIs, FCM, etc.) introduce

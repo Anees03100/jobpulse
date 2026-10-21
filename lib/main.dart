@@ -10,18 +10,40 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  FirebaseMessaging.onMessage.listen((message) {
-    debugPrint('📬 Foreground notification: ${message.notification?.title}');
-    // For now this just logs — a full in-app banner/snackbar can be added
-    // once we're sending real notifications to test against.
-  });
 
-  await GoogleSignIn.instance.initialize(
-    serverClientId:
-        '507378941377-tsqfdrcrjq89hb7d5lfjhiavkmq726rs.apps.googleusercontent.com', // paste from Step 1
-  );
-  await dotenv.load(fileName: '.env');
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  } catch (e) {
+    debugPrint('Firebase initialization error: $e');
+  }
+
+  try {
+    FirebaseMessaging.onMessage.listen((message) {
+      debugPrint('📬 Foreground notification: ${message.notification?.title}');
+      // For now this just logs — a full in-app banner/snackbar can be added
+      // once we're sending real notifications to test against.
+    });
+  } catch (e) {
+    debugPrint('FirebaseMessaging listener error: $e');
+  }
+
+  try {
+    await GoogleSignIn.instance.initialize(
+      serverClientId:
+          '507378941377-tsqfdrcrjq89hb7d5lfjhiavkmq726rs.apps.googleusercontent.com', // paste from Step 1
+    );
+  } catch (e) {
+    debugPrint('GoogleSignIn initialize error: $e');
+  }
+
+  try {
+    await dotenv.load(fileName: '.env');
+  } catch (e) {
+    debugPrint('dotenv load error: $e');
+  }
+
   runApp(const ProviderScope(child: JobPulseApp()));
 }
 
@@ -30,7 +52,7 @@ class JobPulseApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final router = ref.read(appRouterProvider);
+    final router = ref.watch(appRouterProvider);
     return MaterialApp.router(
       title: 'JobPulse',
       debugShowCheckedModeBanner: false,

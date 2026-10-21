@@ -6,7 +6,6 @@ import 'package:flutter/foundation.dart';
 /// WITHOUT rebuilding the GoRouter instance itself.
 class GoRouterRefreshStream extends ChangeNotifier {
   GoRouterRefreshStream(Stream<dynamic> stream) {
-    notifyListeners();
     _subscription = stream.asBroadcastStream().listen((_) => notifyListeners());
   }
 

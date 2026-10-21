@@ -154,8 +154,9 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                   obscureText: true,
                   prefixIcon: Icons.lock_outline,
                   validator: (v) {
-                    if (v != _passwordController.text)
+                    if (v != _passwordController.text) {
                       return 'Passwords do not match';
+                    }
                     return null;
                   },
                 ),
