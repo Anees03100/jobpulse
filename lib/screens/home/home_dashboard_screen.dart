@@ -22,6 +22,12 @@ class HomeDashboardScreen extends ConsumerWidget {
     final jobFeed = ref.watch(jobFeedProvider);
     final savedIds = ref.watch(savedJobIdsProvider).value ?? {};
 
+    final jobsList = jobFeed.value ?? [];
+    final matchCount = jobsList.length;
+    final bestScore = jobsList.isNotEmpty
+        ? '${jobsList.map((j) => j.score).reduce((a, b) => a > b ? a : b)}%'
+        : '--';
+
     return Scaffold(
       backgroundColor:
           AppColors.lightBackground, // light bg makes white cards pop
@@ -41,9 +47,9 @@ class HomeDashboardScreen extends ConsumerWidget {
               children: [
                 Row(
                   children: [
-                    _StatBlock(value: '24', label: 'New Matches'),
-                    _StatBlock(value: '92%', label: 'Best Match'),
-                    _StatBlock(value: '8', label: 'Saved'),
+                    _StatBlock(value: '$matchCount', label: 'New Matches'),
+                    _StatBlock(value: bestScore, label: 'Best Match'),
+                    _StatBlock(value: '${savedIds.length}', label: 'Saved'),
                   ],
                 ),
                 const SizedBox(height: AppSpacing.lg),

@@ -1,6 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jobpulse/services/job_api/jooble_service.dart';
+import 'package:jobpulse/services/job_api/pakistan_jobs_service.dart';
+import '../models/job_model.dart';
 import '../models/user_preferences_model.dart';
 import '../services/matching/matching_engine.dart';
 import 'auth_provider.dart';
@@ -28,23 +31,56 @@ final savedPreferencesProvider = FutureProvider<UserPreferences?>((ref) async {
 });
 
 final joobleServiceProvider = Provider<JoobleService>((ref) => JoobleService());
+final pakistanJobsServiceProvider =
+    Provider<PakistanJobsService>((ref) => PakistanJobsService());
 
 final jobFeedProvider = FutureProvider<List<ScoredJob>>((ref) async {
   final prefs = await ref.watch(savedPreferencesProvider.future);
   if (prefs == null || prefs.skills.isEmpty) return [];
 
-  final service = ref.watch(joobleServiceProvider);
-  final keywords = prefs.skills.take(3).join(' ');
-  final city = prefs.remote
-      ? null
-      : (prefs.cities.isNotEmpty ? prefs.cities.first : prefs.country);
+  final pkService = ref.watch(pakistanJobsServiceProvider);
+  final joobleService = ref.watch(joobleServiceProvider);
 
-  var jobs = await service.fetchJobs(keywords: keywords, location: city);
+  final allJobs = <JobModel>[];
+  final seenIds = <String>{};
 
-  // Widen search if the city-specific query comes back empty
-  if (jobs.isEmpty && city != null) {
-    jobs = await service.fetchJobs(keywords: keywords, location: null);
+  // 1. Fetch live and curated Pakistan jobs (with Rawalpindi / Islamabad focus)
+  try {
+    final pkJobs = await pkService.fetchJobs(
+      skills: prefs.skills,
+      cities: prefs.cities,
+      remote: prefs.remote,
+    );
+    for (final job in pkJobs) {
+      if (seenIds.add(job.id)) {
+        allJobs.add(job);
+      }
+    }
+  } catch (e) {
+    debugPrint('Error fetching Pakistan jobs: $e');
   }
 
-  return MatchingEngine.scoreAndSort(jobs, prefs);
+  // 2. Fetch from Jooble with location restricted to user's city/country
+  final city = prefs.cities.isNotEmpty ? prefs.cities.first : prefs.country;
+  if (city != null) {
+    try {
+      final keywords = prefs.skills.take(2).join(' ');
+      final locationQuery = '$city, Pakistan';
+      final joobleJobs = await joobleService.fetchJobs(
+        keywords: keywords,
+        location: locationQuery,
+      );
+      for (final job in joobleJobs) {
+        if (seenIds.add(job.id)) {
+          allJobs.add(job);
+        }
+      }
+    } catch (e) {
+      debugPrint('Error fetching Jooble jobs: $e');
+    }
+  }
+
+  // MatchingEngine filters out foreign/ineligible locations, removes stale
+  // postings older than 45 days, and places recent listings on top.
+  return MatchingEngine.scoreAndSort(allJobs, prefs);
 });

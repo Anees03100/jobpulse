@@ -67,6 +67,76 @@ class JobModel {
     );
   }
 
+  factory JobModel.fromSkillzDunya(Map<String, dynamic> json) {
+    final title = (json['title'] as String? ?? '').trim();
+    String orgName = 'Pakistan Employer';
+    if (json['organization'] is Map<String, dynamic>) {
+      orgName = (json['organization']['title'] as String?)?.trim() ?? 'Pakistan Employer';
+    }
+
+    final citiesList = <String>[];
+    if (json['cities'] is List) {
+      for (final c in json['cities']) {
+        if (c is Map && c['title'] != null) {
+          citiesList.add(c['title'].toString());
+        }
+      }
+    }
+    final location = citiesList.isNotEmpty
+        ? '${citiesList.join(', ')}, Pakistan'
+        : 'Pakistan';
+
+    final education = json['education_required'] as String? ?? '';
+    final salary = json['salary_range'] as String? ?? '';
+    final description = [
+      title,
+      if (education.isNotEmpty) 'Education: $education',
+      if (salary.isNotEmpty) 'Scale: $salary',
+    ].join('. ');
+
+    final combinedText = '$title $description'.toLowerCase();
+
+    return JobModel(
+      id: 'skillz_${json['id']}',
+      title: title,
+      company: orgName,
+      location: location,
+      type: json['is_government'] == true ? 'Government' : 'Full-time',
+      description: description,
+      url: json['apply_url'] ?? json['url'] ?? '',
+      postedAt: DateTime.tryParse(json['published_at'] ?? '') ?? DateTime.now(),
+      source: 'SkillzDunya',
+      skills: _extractSkills(combinedText),
+      isRemote: combinedText.contains('remote'),
+    );
+  }
+
+  factory JobModel.fromRemotive(Map<String, dynamic> json) {
+    final title = (json['title'] as String? ?? '').trim();
+    final rawDesc = (json['description'] as String? ?? '')
+        .replaceAll(RegExp(r'<[^>]*>'), ' ')
+        .trim();
+    final description = rawDesc.length > 300
+        ? '${rawDesc.substring(0, 300)}...'
+        : rawDesc;
+    final combinedText = '$title $description'.toLowerCase();
+    final candLoc = (json['candidate_required_location'] as String? ?? 'Worldwide').trim();
+
+    return JobModel(
+      id: 'remotive_${json['id']}',
+      title: title,
+      company: json['company_name'] ?? 'Tech Company',
+      location: candLoc.isEmpty ? 'Remote (Worldwide)' : 'Remote ($candLoc)',
+      type: json['job_type'] ?? 'Full-time',
+      description: description,
+      url: json['url'] ?? '',
+      postedAt: DateTime.tryParse(json['publication_date'] ?? '') ?? DateTime.now(),
+      source: 'Remotive',
+      skills: _extractSkills(combinedText),
+      isRemote: true,
+    );
+  }
+
   /// Very simple keyword-matching skill extraction — checks description/title
   /// text against a known skill vocabulary. Good enough for v1; can be
   /// swapped for a smarter NLP approach later.

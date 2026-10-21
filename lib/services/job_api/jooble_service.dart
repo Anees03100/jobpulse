@@ -28,39 +28,42 @@ class JoobleService {
       '🌐 Requesting: $uri with keywords="$keywords" location="$location"',
     );
 
-    final response = await http
-        .post(
-          uri,
-          headers: {'Content-Type': 'application/json'},
-          body: jsonEncode({
-            'keywords': keywords,
-            if (location != null && location.isNotEmpty) 'location': location,
-            'page': '$page',
-          }),
-        )
-        .timeout(
-          const Duration(seconds: 15),
-          onTimeout: () =>
-              throw Exception('Jooble request timed out after 15s'),
+    try {
+      final response = await http
+          .post(
+            uri,
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({
+              'keywords': keywords,
+              if (location != null && location.isNotEmpty) 'location': location,
+              'page': '$page',
+            }),
+          )
+          .timeout(
+            const Duration(seconds: 10),
+            onTimeout: () =>
+                throw Exception('Jooble request timed out after 10s'),
+          );
+
+      debugPrint('📩 Jooble response status: ${response.statusCode}');
+
+      if (response.statusCode != 200) {
+        debugPrint(
+          'Jooble API error: ${response.statusCode} — ${response.body}',
         );
+        return [];
+      }
 
-    debugPrint('📩 Jooble response status: ${response.statusCode}');
-    debugPrint(
-      '📩 Jooble response body (first 300 chars): ${response.body.substring(0, response.body.length < 300 ? response.body.length : 300)}',
-    );
+      final data = jsonDecode(response.body) as Map<String, dynamic>;
+      final jobs = (data['jobs'] as List<dynamic>? ?? []);
+      debugPrint('✅ Parsed ${jobs.length} jobs from Jooble');
 
-    if (response.statusCode != 200) {
-      throw Exception(
-        'Jooble API error: ${response.statusCode} — ${response.body}',
-      );
+      return jobs
+          .map((json) => JobModel.fromJooble(json as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      debugPrint('Jooble fetch error: $e');
+      return [];
     }
-
-    final data = jsonDecode(response.body) as Map<String, dynamic>;
-    final jobs = (data['jobs'] as List<dynamic>? ?? []);
-    debugPrint('✅ Parsed ${jobs.length} jobs from Jooble');
-
-    return jobs
-        .map((json) => JobModel.fromJooble(json as Map<String, dynamic>))
-        .toList();
   }
 }
