@@ -34,7 +34,13 @@ class ProfileScreen extends ConsumerWidget {
     if (confirmed != true) return;
 
     try {
-      await ref.read(authServiceProvider).signOut();
+      final auth = ref.read(authServiceProvider);
+      final uid = auth.currentUser?.uid;
+
+      // Stop this account's alerts from reaching this device
+      if (uid != null) await ref.read(fcmServiceProvider).clearToken(uid);
+
+      await auth.signOut();
       ref.invalidate(preferencesSetProvider);
     } catch (e) {
       if (context.mounted) AppSnackbar.error(context, ErrorMapper.map(e));

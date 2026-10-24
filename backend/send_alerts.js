@@ -50,6 +50,8 @@ function normalizeJob(json) {
     return {
         id: `jooble_${json.id}`,
         title,
+        description: snippet,
+        source: 'Jooble',
         company: company || 'Unknown Company',
         location: json.location ?? 'Pakistan',
         type: json.type ?? 'Full-time',
@@ -198,9 +200,20 @@ async function processUser(doc) {
     const batch = db.batch();
     for (const f of fresh) {
         batch.set(sentCol.doc(f.job.id), {
-            sentAt: admin.firestore.FieldValue.serverTimestamp(),
-            score: f.score,
+            // Same field names as JobModel.fromMap in the app
+            id: f.job.id,
             title: f.job.title,
+            company: f.job.company,
+            location: f.job.location,
+            type: f.job.type,
+            description: f.job.description,
+            url: f.job.url,
+            postedAt: f.job.postedAt.toISOString(),
+            source: f.job.source,
+            skills: f.job.skills,
+            isRemote: f.job.isRemote,
+            score: f.score,
+            sentAt: admin.firestore.FieldValue.serverTimestamp(),
         });
     }
     await batch.commit();
