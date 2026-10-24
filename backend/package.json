@@ -1,0 +1,11 @@
+{
+    "name": "jobpulse-alerts",
+    "private": true,
+    "version": "1.0.0",
+    "scripts": {
+        "start": "node send_alerts.js"
+    },
+    "dependencies": {
+        "firebase-admin": "^13.0.0"
+    }
+}

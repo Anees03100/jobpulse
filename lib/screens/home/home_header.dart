@@ -1,93 +1,238 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../providers/nav_provider.dart';
+import '../../theme/app_colors.dart';
 import '../../theme/app_spacing.dart';
-import '../../theme/app_typography.dart';
 
 class HomeHeader extends ConsumerWidget {
-  const HomeHeader({super.key, required this.name});
+  const HomeHeader({
+    super.key,
+    required this.name,
+    required this.matchCount,
+    required this.bestScore,
+    required this.savedCount,
+  });
 
   final String name;
+  final int matchCount;
+  final String bestScore;
+  final int savedCount;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(AppSpacing.lg, 20, AppSpacing.lg, 28),
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFF171717), Color(0xFFF57D0A)],
-        ),
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(28),
-          bottomRight: Radius.circular(28),
-        ),
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.lg,
+        0,
+        AppSpacing.lg,
+        AppSpacing.lg,
       ),
       child: SafeArea(
         bottom: false,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            const SizedBox(height: AppSpacing.md),
+            // ── Top row: avatar + name · notification bell ──────────
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _CircleIconButton(
-                  icon: Icons.grid_view_rounded,
-                  onTap: () =>
-                      ref.read(currentTabIndexProvider.notifier).state = 3,
-                ),
-                _CircleIconButton(
-                  icon: Icons.notifications_none,
-                  showDot: true,
-                  onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Notifications coming soon'),
+                // User avatar
+                Container(
+                  height: 38,
+                  width: 38,
+                  decoration: const BoxDecoration(
+                    color: AppColors.textPrimary,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Center(
+                    child: Text(
+                      name.isNotEmpty ? name[0].toUpperCase() : 'U',
+                      style: GoogleFonts.inter(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
                       ),
-                    );
-                  },
+                    ),
+                  ),
                 ),
-              ],
-            ),
-            const SizedBox(height: AppSpacing.lg),
-            Text(
-              'Hi, $name 👋',
-              style: AppTypography.body.copyWith(color: Colors.white70),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              'Discover Your\nBest Opportunity',
-              style: AppTypography.pageTitle.copyWith(
-                color: Colors.white,
-                height: 1.2,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.lg),
-            GestureDetector(
-              onTap: () => ref.read(currentTabIndexProvider.notifier).state =
-                  1, // jump to Discover
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.md,
-                  vertical: 14,
+                const SizedBox(width: 10),
+                Text(
+                  'Hi, $name',
+                  style: GoogleFonts.inter(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary,
+                  ),
                 ),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.18),
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-                  border: Border.all(color: Colors.white24),
-                ),
-                child: Row(
+                const Spacer(),
+                // Notification bell with orange dot
+                Stack(
+                  clipBehavior: Clip.none,
                   children: [
-                    const Icon(Icons.search, color: Colors.white70, size: 20),
-                    const SizedBox(width: 10),
-                    Text(
-                      'Search job',
-                      style: AppTypography.body.copyWith(color: Colors.white70),
+                    GestureDetector(
+                      onTap: () {},
+                      child: Container(
+                        height: 38,
+                        width: 38,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: AppColors.border,
+                            width: 1,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.06),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: const Icon(
+                          Icons.notifications_none_rounded,
+                          size: 20,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      top: 8,
+                      right: 10,
+                      child: Container(
+                        height: 7,
+                        width: 7,
+                        decoration: const BoxDecoration(
+                          color: AppColors.primary,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
                     ),
                   ],
                 ),
-              ),
+              ],
+            ),
+
+            const SizedBox(height: AppSpacing.xl),
+
+            // ── Big match count stat ─────────────────────────────────
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.baseline,
+              textBaseline: TextBaseline.alphabetic,
+              children: [
+                Text(
+                  '$matchCount',
+                  style: GoogleFonts.inter(
+                    fontSize: 68,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.textPrimary,
+                    height: 1.0,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Text.rich(
+                  TextSpan(
+                    children: [
+                      TextSpan(
+                        text: 'new jobs\nmatch you',
+                        style: GoogleFonts.inter(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.textPrimary,
+                          height: 1.4,
+                        ),
+                      ),
+                      TextSpan(
+                        text: '.',
+                        style: GoogleFonts.inter(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: AppSpacing.md),
+
+            // ── Pill chips ──────────────────────────────────────────
+            Row(
+              children: [
+                _PillChip(label: '$bestScore best match'),
+                const SizedBox(width: 8),
+                _PillChip(label: '$savedCount saved'),
+              ],
+            ),
+
+            const SizedBox(height: AppSpacing.lg),
+
+            // ── Search bar ──────────────────────────────────────────
+            Row(
+              children: [
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () =>
+                        ref.read(currentTabIndexProvider.notifier).state = 1,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 14,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(40),
+                        border: Border.all(color: AppColors.border),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.04),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.search,
+                            color: AppColors.textSecondary,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 10),
+                          Text(
+                            'Search jobs',
+                            style: GoogleFonts.inter(
+                              fontSize: 15,
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                GestureDetector(
+                  onTap: () =>
+                      ref.read(currentTabIndexProvider.notifier).state = 1,
+                  child: Container(
+                    height: 48,
+                    width: 48,
+                    decoration: const BoxDecoration(
+                      color: AppColors.textPrimary,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.tune_rounded,
+                      color: Colors.white,
+                      size: 20,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -96,41 +241,25 @@ class HomeHeader extends ConsumerWidget {
   }
 }
 
-class _CircleIconButton extends StatelessWidget {
-  const _CircleIconButton({
-    required this.icon,
-    required this.onTap,
-    this.showDot = false,
-  });
-  final IconData icon;
-  final VoidCallback onTap;
-  final bool showDot;
+class _PillChip extends StatelessWidget {
+  const _PillChip({required this.label});
+  final String label;
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        height: 40,
-        width: 40,
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.15),
-          shape: BoxShape.circle,
-        ),
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            Icon(icon, color: Colors.white, size: 20),
-            if (showDot)
-              const Positioned(
-                right: 10,
-                top: 10,
-                child: CircleAvatar(
-                  radius: 4,
-                  backgroundColor: Color(0xFFF57D0A),
-                ),
-              ),
-          ],
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(40),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Text(
+        label,
+        style: GoogleFonts.inter(
+          fontSize: 13,
+          fontWeight: FontWeight.w500,
+          color: AppColors.textPrimary,
         ),
       ),
     );
