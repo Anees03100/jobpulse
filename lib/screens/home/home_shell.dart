@@ -36,7 +36,6 @@ class _HomeShellState extends ConsumerState<HomeShell> {
       final router = GoRouter.of(context);
 
       try {
-        // Tap handling first, so the permission dialog can't delay it
         await ref.read(notificationHandlerProvider).init(router);
         await ref.read(fcmServiceProvider).initAndSaveToken(user.uid);
       } catch (e) {
